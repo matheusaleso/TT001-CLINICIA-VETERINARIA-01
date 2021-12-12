@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class DAO {
-    public static final String DBURL = "jdbc:sqlite:vet2021-23.db";
+    public static final String DBURL = "jdbc:sqlite:vet2021-37.db";
     private static Connection con;
     protected static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -80,10 +80,10 @@ public abstract class DAO {
             stmt = DAO.getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS cliente( \n"
                     + "id INTEGER PRIMARY KEY, \n"
                     + "nome VARCHAR, \n"
-                    + "end VARCHAR, \n"
-                    + "cep VARCHAR, \n"
                     + "email VARCHAR, \n"
-                    + "telefone VARCHAR); \n");
+                    + "telefone VARCHAR, \n"
+                    + "end VARCHAR, \n"
+                    + "cep VARCHAR); \n");
             executeUpdate(stmt);
             // Table animal:
             stmt = DAO.getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS animal( \n"

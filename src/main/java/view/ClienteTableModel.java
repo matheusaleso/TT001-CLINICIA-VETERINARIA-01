@@ -9,7 +9,7 @@ import controller.Controller;
 public class ClienteTableModel extends GenericTableModel{
     
 	public ClienteTableModel(List vDados){
-        super(vDados, new String[]{"Nome","Endereco","Telefone","Cep"});
+        super(vDados, new String[]{"Nome","E-mail","Telefone","Endereço","CEP"});
     }
     
     @Override
@@ -39,13 +39,13 @@ public class ClienteTableModel extends GenericTableModel{
             case 0:
                 return cliente.getNome();
             case 1:
-                return cliente.getEndereco();
+                return cliente.getEmail();
             case 2:
                 return cliente.getTelefone();
             case 3:
-            	return cliente.getCep();
+            	return cliente.getEndereco();
             case 4:
-            	return cliente.getEmail();
+            	return cliente.getCep();
             default:
                 throw new IndexOutOfBoundsException("columnIndex out of bounds");
         }
@@ -61,16 +61,16 @@ public class ClienteTableModel extends GenericTableModel{
             	cliente.setNome((String)aValue);
                 break;
             case 1:
-            	cliente.setEndereco((String)aValue);
+            	cliente.setEmail((String)aValue);
                 break;
             case 2:
             	cliente.setTelefone((String)aValue);
                 break;
             case 3:
-            	cliente.setCep((String) aValue);
+            	cliente.setEndereco((String) aValue);
             	break;
             case 4:
-            	cliente.setEmail((String) aValue);
+            	cliente.setCep((String) aValue);
             	break;
             default:
                 throw new IndexOutOfBoundsException("columnIndex out of bounds");

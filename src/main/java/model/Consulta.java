@@ -1,5 +1,7 @@
 package model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import model.Tratamento;
 import model.TratamentoDAO;
@@ -7,6 +9,7 @@ import model.VeterinarioDAO;
 import model.Veterinario;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 //import java.util.Date;
 
@@ -17,14 +20,15 @@ import java.util.concurrent.TimeUnit;
 public class Consulta {
     private int id;
     private Calendar data;
-    private Date hora;
+    private String hora;
     private String comentarios;
     private int idAnimal;
     private int idVet;
     private int idTratamento;
     private boolean terminou;    
-
-    public Consulta(int id, Calendar data, Date hora, String comentarios, int idAnimal, int idVet, int idTratamento, boolean terminou) {
+    private java.sql.Date sqlHour;
+    
+    public Consulta(int id, Calendar data, String hora, String comentarios, int idAnimal, int idVet, int idTratamento, boolean terminou) {
         this.id = id;
         this.data = data;
         this.hora = hora;
@@ -45,25 +49,28 @@ public class Consulta {
     public void setData(Calendar data) {
         this.data = data;
     }
+    
 
-    public Date getHora() {
+    public String getHora() {
         return hora;
     }
 
-    public void setHora(Date hora) {
+
+    public void setSqlHour(java.sql.Date sqlHour) {
+        this.sqlHour = sqlHour;
+    }
+
+    public void setHora(String hora) {
         this.hora = hora;
     }
-    
-    public String getStringHour(){
-        /*
-       String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(hora),
-            TimeUnit.MILLISECONDS.toMinutes(hora) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(hora)),
-            TimeUnit.MILLISECONDS.toSeconds(hora) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(hora)));*/
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        String sCertDate = dateFormat.format(hora);
        
-       return sCertDate;
-    }
+    
+    public Date addHours(Date date, int hours) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.HOUR_OF_DAY, hours);
+    return calendar.getTime();
+}
 
     public String getComentarios() {
         return comentarios;
@@ -76,7 +83,13 @@ public class Consulta {
     public int getIdAnimal() {
         return idAnimal;
     }
-
+    
+    public int getIdCliente() {
+        Animal animal = AnimalDAO.getInstance().retrieveById(idAnimal);
+        int clienteID = animal.getIdCliente();
+      
+        return clienteID;
+    }
     public void setIdAnimal(int idAnimal) {
         this.idAnimal = idAnimal;
     }
@@ -89,6 +102,13 @@ public class Consulta {
         this.idVet = idVet;
     }
 
+    public java.util.Date getHourAsDate() throws ParseException{
+        String string = "2016-09-23 " + hora + ":22";
+        DateFormat dataformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date date = dataformat.parse(string); 
+
+        return date;
+    }
     public int getIdTratamento() {
         return idTratamento;
     }
@@ -118,9 +138,51 @@ public class Consulta {
     
     public String dataConsulta(){
       String day =  Integer.toString(data.get(Calendar.DAY_OF_MONTH));
-      String month =  Integer.toString(data.get(Calendar.MONTH));
+      String monthWrong =  Integer.toString(data.get(Calendar.MONTH));
+      String month = "";
       String year = Integer.toString(data.get(Calendar.YEAR));
       
+      switch(monthWrong){
+          case "0":
+              month = "01";
+              break;
+          case "1":
+              month = "02";
+              break;
+          case "2":
+              month = "03";
+              break;
+          case "3":
+              month = "04";
+              break;
+          case "4":
+              month = "05";
+              break;
+          case "5":
+              month = "06";
+              break;
+          case "6":
+              month = "07";
+              break;
+          case "7":
+              month = "08";
+              break;
+          case "8":
+              month = "09";
+              break;
+          case "9":
+              month = "10";
+              break;
+          case "10":
+              month = "11";
+              break;
+          case "11":
+              month = "12";
+              break;
+          default:
+              month = "Error";
+              break;    
+      }
       String dataC = day + "/" + month + "/" + year;
         return dataC;
     }

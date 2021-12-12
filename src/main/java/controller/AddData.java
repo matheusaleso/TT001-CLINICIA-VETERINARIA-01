@@ -16,12 +16,14 @@ import model.AnimalDAO;
 import model.Cliente;
 import model.ClienteDAO;
 import model.EspecieDAO;
+import model.TratamentoDAO;
+import model.Especie;
 import model.VeterinarioDAO;
 import view.AnimalTableModel;
 import view.ClienteTableModel;
 import view.EspecieTableModel;
 import view.VeterinarioTableModel;
-
+import java.util.HashMap;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +36,13 @@ import javax.swing.event.ChangeEvent;
 import model.ConsultaDAO;
 import view.ConsultaTableModel;
 import java.awt.event.*;  
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComboBox;
+import model.Animal;
+import model.Tratamento;
+import model.Veterinario;
 
 /**
  *
@@ -42,27 +51,31 @@ import java.awt.event.*;
 public class AddData {
         public static void addClient(JTable table){
         JTextField clientName = new JTextField();
+        JTextField clientEmail = new JTextField();
+        JTextField clientPhone = new JTextField();
         JTextField clientAddress = new JTextField();
         JTextField clientCEP = new JTextField();
-        JTextField clientPhone = new JTextField();
-        JTextField clientEmail = new JTextField();
+        
+        
         
         final JComponent[] inputs = new JComponent[] {
         new JLabel("Nome:"),
         clientName,
+        new JLabel("E-mail:"),
+        clientEmail,
+        new JLabel("Telefone:"),
+        clientPhone,
         new JLabel("Endereço:"),
         clientAddress,
         new JLabel("CEP:"),
         clientCEP,
-        new JLabel("Telefone:"),
-        clientPhone,
-        new JLabel("E-mail:"),
-        clientEmail,
+
+        
 };
 int result = JOptionPane.showConfirmDialog(null, inputs, "CADASTRO DE CLIENTE", JOptionPane.PLAIN_MESSAGE);
 if (result == JOptionPane.OK_OPTION) {
-            ClienteDAO.getInstance().create(clientName.getText(),
-                clientAddress.getText(),clientCEP.getText(),clientPhone.getText(),clientEmail.getText());
+            ClienteDAO.getInstance().create(clientName.getText(),clientEmail.getText(),clientPhone.getText(),
+                clientAddress.getText(),clientCEP.getText());
             
            setTableModel(table,new ClienteTableModel(ClienteDAO.getInstance().retrieveAll()));
 } else {
@@ -74,21 +87,43 @@ if (result == JOptionPane.OK_OPTION) {
 public static void addAnimal(JTable table){
         JTextField animalName = new JTextField();
         JTextField animalBirthyear = new JTextField();
-        JTextField animalSex = new JTextField();
-        JTextField animalEspecieID = new JTextField();
-        JTextField animalClientID = new JTextField();
         
+        HashMap<String, Integer> especiesByName = new HashMap<String, Integer>();
+        List <Especie> especies = EspecieDAO.getInstance().retrieveAll();
+        List <String> especiesName = new ArrayList();
+        especies.forEach(especie -> {
+            especiesName.add(especie.getNome());
+            especiesByName.put(especie.getNome(), especie.getId());
+        });
+        String[] specieArray = especiesName.toArray(new String[especiesName.size()]);
+        JComboBox especieComboBox = new JComboBox(specieArray);
+        
+         String[] sexArray = {"Fêmea", "Macho"};
+        JComboBox sexComboBox = new JComboBox(sexArray);
+        
+        HashMap<String, Integer> clientByName = new HashMap<String, Integer>();
+        List <Cliente> clientes = ClienteDAO.getInstance().retrieveAll();
+        List <String> clientesName = new ArrayList();
+       clientes.forEach(cliente -> {
+            clientesName.add(cliente.getNome());
+            clientByName.put(cliente.getNome(), cliente.getId());
+        });
+        String[] clientArray = clientesName.toArray(new String[clientesName.size()]);
+        JComboBox clienteComboBox = new JComboBox(clientArray); 
+       
         final JComponent[] inputs = new JComponent[] {
         new JLabel("Nome:"),
         animalName,
         new JLabel("Ano de Nascimento:"),
         animalBirthyear,
         new JLabel("Sexo:"),
-        animalSex,
-        new JLabel("ID da Espécie:"),
-        animalEspecieID,
-        new JLabel("ID do Cliente:"),
-        animalClientID,
+        sexComboBox,
+        new JLabel("Espécie:"),
+        especieComboBox,
+        //animalEspecieID,
+        new JLabel("Cliente:"),
+        clienteComboBox,
+        //animalClientID,
 };
 
 
@@ -96,13 +131,14 @@ int result = JOptionPane.showConfirmDialog(null, inputs, "CADASTRO DE ANIMAL", J
 if (result == JOptionPane.OK_OPTION) {
     
     int animalBirthyearInteger = Integer.parseInt(animalBirthyear.getText());
-    int especieId = Integer.parseInt(animalEspecieID.getText());
-    int clientId = Integer.parseInt(animalClientID.getText()); 
+   // int especieId = Integer.parseInt(animalEspecieID.getText());
+    int especieId = especiesByName.get(especieComboBox.getSelectedItem());
+   // int clientId = Integer.parseInt(animalClientID.getText()); 
+    int clientId = clientByName.get(clienteComboBox.getSelectedItem()); 
     Cliente cliente = ClienteDAO.getInstance().retrieveById(clientId);
    
     AnimalDAO.getInstance().create(animalName.getText(),
-                animalBirthyearInteger,
-                animalSex.getText(),
+                animalBirthyearInteger, (String) sexComboBox.getSelectedItem(),
                 especieId,
                 cliente);
     
@@ -161,15 +197,42 @@ if (result == JOptionPane.OK_OPTION) {
 }
 }
              
-  public static void addAppointment(JTable table){
+  public static void addAppointment(JTable table) throws ParseException{
 
         JDateChooser appointmentData = new JDateChooser();
         JTextField comentarios = new JTextField();
-        JTextField animalID = new JTextField();
-        JTextField vetID = new JTextField();
-        JTextField tratamentoID = new JTextField();
         JCheckBox status = new JCheckBox("Tratamento Concluído"); 
  
+        HashMap<String, Integer> animalByName = new HashMap<String, Integer>();
+        List <Animal> animais = AnimalDAO.getInstance().retrieveAll();
+        List <String> animaisName = new ArrayList();
+       animais.forEach(animal -> {
+            animaisName.add(animal.getNome());
+            animalByName.put(animal.getNome(), animal.getId());
+        });
+        String[] animalArray = animaisName.toArray(new String[animaisName.size()]);
+        JComboBox animalComboBox = new JComboBox(animalArray);
+        
+        HashMap<String, Integer> vetByName = new HashMap<String, Integer>();
+        List <Veterinario> veterinarios = VeterinarioDAO.getInstance().retrieveAll();
+        List <String> veterinariosName = new ArrayList();
+       veterinarios.forEach(veterinario -> {
+            veterinariosName.add(veterinario.getNome());
+            vetByName.put(veterinario.getNome(), veterinario.getId());
+        });
+        String[] veterinarioArray = veterinariosName.toArray(new String[veterinariosName.size()]);
+        JComboBox veterinarioComboBox = new JComboBox(veterinarioArray);
+        
+        HashMap<String, Integer> tratamentoByName = new HashMap<String, Integer>();
+        List <Tratamento> tratamentos = TratamentoDAO.getInstance().retrieveAll();
+        List <String> tratamentosName = new ArrayList();
+       tratamentos.forEach(tratamento -> {
+            tratamentosName.add(tratamento.getNome());
+            tratamentoByName.put(tratamento.getNome(), tratamento.getId());
+        });
+        String[] tratamentoArray = tratamentosName.toArray(new String[tratamentosName.size()]);
+        JComboBox tratamentoComboBox = new JComboBox(tratamentoArray);
+        
         Date date = new Date();
         SpinnerDateModel sm = 
         new SpinnerDateModel(date, null, null, Calendar.HOUR_OF_DAY);
@@ -184,12 +247,14 @@ if (result == JOptionPane.OK_OPTION) {
         hourAppointment,
         new JLabel("Comentários:"),
         comentarios,
-        new JLabel("ID do Animal:"),
-        animalID,
-        new JLabel("ID do Veterinario:"),
-        tratamentoID,
-        new JLabel("ID do Tratamento:"),
-        vetID,
+        new JLabel("Animal:"),
+        animalComboBox,
+        //animalID,
+        new JLabel("Veterinario:"),
+        veterinarioComboBox,
+        new JLabel("Tratamento:"),
+        tratamentoComboBox,
+        //tratamentoID,
         status,
         
         
@@ -203,13 +268,19 @@ status.addItemListener(new ItemListener() {
         
 int result = JOptionPane.showConfirmDialog(null, inputs, "NOVA CONSULTA", JOptionPane.PLAIN_MESSAGE);
 if (result == JOptionPane.OK_OPTION) {
-    
-Calendar dataAppointment = appointmentData.getCalendar();
-java.sql.Date sqlHour = new java.sql.Date(date.getTime());
 
-ConsultaDAO.getInstance().create(dataAppointment, sqlHour,
-        comentarios.getText(),Integer.parseInt(animalID.getText()),
-        Integer.parseInt(tratamentoID.getText()),Integer.parseInt(vetID.getText()),status.isSelected());
+
+String hora  = de.getFormat().format(hourAppointment.getValue());
+// Date date1 = new SimpleDateFormat("hh:mm").parse(hourAppointment.getValue().toString());
+Calendar dataAppointment = appointmentData.getCalendar();
+System.out.println("Hora:" + hora);
+int animalId = animalByName.get(animalComboBox.getSelectedItem());
+int vetId = vetByName.get(veterinarioComboBox.getSelectedItem());
+int tratamentoId = tratamentoByName.get(tratamentoComboBox.getSelectedItem());
+
+ConsultaDAO.getInstance().create(dataAppointment, hora,
+        comentarios.getText(),animalId,vetId,
+        tratamentoId,status.isSelected());
    
     setTableModel(table,new ConsultaTableModel(ConsultaDAO.getInstance().retrieveAll()));
             

@@ -23,15 +23,15 @@ public class ClienteDAO extends DAO {
     }
 
 // CRUD    
-    public Cliente create(String nome, String end, String cep, String email, String telefone) {
+    public Cliente create(String nome, String email, String telefone, String end, String cep) {
         try {
             PreparedStatement stmt;
-            stmt = DAO.getConnection().prepareStatement("INSERT INTO cliente (nome, end, cep, email, telefone) VALUES (?,?,?,?,?)");
+            stmt = DAO.getConnection().prepareStatement("INSERT INTO cliente (nome, email, telefone, end, cep) VALUES (?,?,?,?,?)");
             stmt.setString(1, nome);
-            stmt.setString(2, end);
-            stmt.setString(3, cep);
-            stmt.setString(4, email);
-            stmt.setString(5, telefone);
+            stmt.setString(2, email);
+            stmt.setString(3, telefone);
+            stmt.setString(4, end);
+            stmt.setString(5, cep);
             executeUpdate(stmt);
         } catch (SQLException ex) {
             Logger.getLogger(ClienteDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -51,7 +51,7 @@ public class ClienteDAO extends DAO {
     private Cliente buildObject(ResultSet rs) {
         Cliente cliente = null;
         try {
-            cliente = new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("end"), rs.getString("cep"), rs.getString("email"), rs.getString("telefone"));
+            cliente = new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), rs.getString("telefone"), rs.getString("end"), rs.getString("cep"));
         } catch (SQLException e) {
             System.err.println("Exception: " + e.getMessage());
         }
@@ -97,12 +97,12 @@ public class ClienteDAO extends DAO {
     public void update(Cliente cliente) {
         try {
             PreparedStatement stmt;
-            stmt = DAO.getConnection().prepareStatement("UPDATE cliente SET nome=?, end=?, cep=?, email=?, telefone=? WHERE id=?");
+            stmt = DAO.getConnection().prepareStatement("UPDATE cliente SET nome=?, email=?, telefone=?, end=?, cep=? WHERE id=?");
             stmt.setString(1, cliente.getNome());
-            stmt.setString(2, cliente.getEndereco());
-            stmt.setString(3, cliente.getCep());
-            stmt.setString(4, cliente.getEmail());
-            stmt.setString(5, cliente.getTelefone());
+            stmt.setString(2, cliente.getEmail());
+            stmt.setString(3, cliente.getTelefone());
+            stmt.setString(4, cliente.getEndereco());
+            stmt.setString(5, cliente.getCep());
             stmt.setInt(6, cliente.getId());
             executeUpdate(stmt);
         } catch (SQLException e) {

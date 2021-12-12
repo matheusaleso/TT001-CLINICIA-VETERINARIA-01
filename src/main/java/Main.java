@@ -10,17 +10,31 @@ import model.VeterinarioDAO;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.swing.SpinnerDateModel;
 
 public class Main {
     public static void main(String[] args) {   
+       
         ClienteDAO.getInstance().create("Matheus Sales Oliveira",
-                "Rua Três","123456789","00234-905","m203577@dac.unicamp.br");
+               "m203577@dac.unicamp.br",
+               "123456789", 
+               "Rua Três",
+               "00234-905");
+        
         Cliente c1 = ClienteDAO.getInstance().retrieveById(1);
-        ClienteDAO.getInstance().create("Matilda Santana Antunes",
-                "Rua Quatro","8339383","01234-905","m223444@dac.unicamp.br");
+        ClienteDAO.getInstance().create(
+                "Matilda Santana Antunes",
+                "m223444@dac.unicamp.br",
+                "8339383",
+                "Rua Quatro",
+                "01234-905");
         Cliente c2 = ClienteDAO.getInstance().retrieveById(2);
+        
         ClienteDAO.getInstance().create("Lucas Almeida Ferreira",
-                "Rua Cinco","829483","13534-385","202347@dac.unicamp.br");
+                "202347@dac.unicamp.br",
+                "829483",
+                "Rua Cinco",
+                "13534-385");
         Cliente c3 = ClienteDAO.getInstance().retrieveById(3);
         
         EspecieDAO.getInstance().create("Gato");
@@ -50,12 +64,14 @@ public class Main {
         Calendar data4 = new GregorianCalendar(2013,1,28,13,24,56);
         TratamentoDAO.getInstance().create("Cinomose",data1,data2,01,true);
         TratamentoDAO.getInstance().create("Rotina",data3,data4,02,false);
-        TratamentoDAO.getInstance().create("Doença 300",data3,data4,03,false); 
+        TratamentoDAO.getInstance().create("Dor",data3,data4,03,false); 
         
-        Date d = new Date();
-        d.setTime(3600000);
-        ConsultaDAO.getInstance().create(data1, (java.sql.Date) d,"Consulta de rotina",01,02,01,true);
-        ConsultaDAO.getInstance().create(data1, (java.sql.Date) d,"Consulta de avaliação",04,02,01,false);
+        Date date = new Date();
+        SpinnerDateModel sm = 
+        new SpinnerDateModel(date, null, null, Calendar.HOUR_OF_DAY);
+        java.sql.Date sqlHour = new java.sql.Date(date.getTime());
+        ConsultaDAO.getInstance().create(data1, "10:02","Consulta de rotina",01,02,01,true);
+        ConsultaDAO.getInstance().create(data1, "10:02","Consulta de avaliação",04,02,01,false);
  
         ExameDAO.getInstance().create("Exame de Sangue",01);
         ExameDAO.getInstance().create("Teste de Urina",02);
@@ -67,6 +83,7 @@ public class Main {
         System.out.println("Tratamentos: "+TratamentoDAO.getInstance().retrieveAll());
         System.out.println("Consultas: "+ConsultaDAO.getInstance().retrieveAll());
         System.out.println("Exames: "+ExameDAO.getInstance().retrieveAll());
+        
     }
 } 
 
